@@ -1,0 +1,112 @@
+ Sub stock()
+
+'set varibles
+Dim ws As Worksheet
+Dim ticker As String
+Dim vol As Double
+Dim year_open As Double
+Dim year_close As Double
+Dim yearly_change As Double
+Dim percent_change As Double
+Dim Summary_Table_Row As Long
+Dim PreviousAmount As Long
+PreviousAmount = 2
+Dim GreatestIncrease As Double
+GreatestIncrease = 0
+Dim GreatestDecrease As Double
+GreatestDecrease = 0
+Dim lastRowValue As Long
+Dim GreatesttotalVolume As Double
+GreatesttotalVolume = 0
+Dim totalstockvolume As Double
+totalstockvolume = 0
+Dim FinalRow As Long
+
+
+'Set column titles
+For Each ws In ThisWorkbook.Worksheets
+    ws.Cells(1, 10).Value = "Ticker"
+    ws.Cells(1, 11).Value = "Yearly Change"
+    ws.Cells(1, 12).Value = "Percent Change"
+    ws.Cells(1, 13).Value = "Total Stock Volume"
+    ws.Cells(2, 16).Value = "Greatest % Increase"
+    ws.Cells(3, 16).Value = "Greatest % Decrease"
+    ws.Cells(4, 16).Value = "Greatest Total Volume"
+    ws.Cells(1, 17).Value = "Ticker"
+    ws.Cells(1, 18).Value = "Value"
+    Summary_Table_Row = 2
+    FinalRow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+    
+    
+'Looping time
+  'Total stock volume
+  
+    For i = 2 To FinalRow
+    totalstockvolume = totalstockvolume + ws.Cells(i, 7).Value
+    If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+    
+    ticker = ws.Cells(i, 1).Value
+    ws.Range("J" & Summary_Table_Row).Value = ticker
+    ws.Range("M" & Summary_Table_Row).Value = totalstockvolume
+   
+ 
+    PreviousAmount = i + 1
+   
+    totalstockvolume = 0
+
+   Summary_Table_Row = Summary_Table_Row + 1
+   PreviousAmount = i + 1
+
+      '% change
+ 
+      year_open = ws.Range("C" & PreviousAmount)
+      year_close = ws.Range("F" & i)
+      yearly_change = year_close - year_open
+       ws.Range("K" & i).Value = yearly_change
+    
+     If year_open = 0 Then
+        percent_change = 0
+    Else: year_open = ws.Range("C" & PreviousAmount)
+        percent_change = yearly_change / year_open
+     
+       ws.Range("L" & Summary_Table_Row).NumberFormat = "0.00%"
+       ws.Range("L" & Summary_Table_Row).Value = percent_change
+     
+        If ws.Range("K" & Summary_Table_Row).Value > 0 Then
+                    ws.Range("K" & Summary_Table_Row).Interior.ColorIndex = 4
+            Else: ws.Range("K" & Summary_Table_Row).Interior.ColorIndex = 3
+              Summary_Table_Row = Summary_Table_Row + 1
+             PreviousAmount = i + 1
+             
+        End If
+        
+           
+
+  'greatest % increase, greatest % decress and greatest total volume
+  FinalRow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+
+   
+
+                If ws.Range("K" & i).Value > ws.Range("Q2").Value Then
+                    ws.Range("R2").Value = ws.Range("K" & i).Value
+                    ws.Range("Q2").Value = ws.Range("I" & i).Value
+               End If
+
+                If ws.Range("K" & i).Value < ws.Range("Q3").Value Then
+                    ws.Range("R3").Value = ws.Range("K" & i).Value
+                    ws.Range("Q3").Value = ws.Range("I" & i).Value
+               End If
+
+                If ws.Range("L" & i).Value > ws.Range("Q4").Value Then
+                    ws.Range("R4").Value = ws.Range("L" & i).Value
+                    ws.Range("Q4").Value = ws.Range("I" & i).Value
+             End If
+
+        Next i
+         
+        ' Format Double To Include % Symbol And Two Decimal Places
+            ws.Range("Q2").NumberFormat = "0.00%"
+            ws.Range("Q3").NumberFormat = "0.00%"
+ 
+ Next ws
+End Sub
